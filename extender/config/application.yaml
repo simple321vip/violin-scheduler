@@ -1,0 +1,11 @@
+server:
+  name: violin-scheduler
+  addr: "0.0.0.0:8080"
+
+zap:
+  debugFileName: "C:\\log\\violin-scheduler\\debug.log"
+  infoFileName: "C:\\log\\violin-scheduler\\info.log"
+  warnFileName: "C:\\log\\violin-scheduler\\warn.log"
+  maxSize: 500
+  maxAge: 28
+  maxBackups: 3
