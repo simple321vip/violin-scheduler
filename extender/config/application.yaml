@@ -9,3 +9,14 @@ zap:
   maxSize: 500
   maxAge: 28
   maxBackups: 3
+
+scheduler:
+  pod:
+    namespace: "test"
+    selectorLabel:
+      key: "violin-scheduler-pod"
+      value: "violin-scheduler"
+  node:
+    selectorLabel: "violin-scheduler-node"
+  zone:
+    selectorLabel: "violin-scheduler-zone"

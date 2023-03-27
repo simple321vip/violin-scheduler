@@ -8,10 +8,13 @@ import (
 )
 
 type Config struct {
-	viper            *viper.Viper
-	SC               *ServerConfig
-	LC               *common.LogConfig
-	PodSelectorLabel string
+	viper                 *viper.Viper
+	SC                    *ServerConfig
+	LC                    *common.LogConfig
+	PodSelectorLabelKey   string
+	PodSelectorLabelValue string
+	NodeSelectorLabel     string
+	ZoneSelectorLabel     string
 }
 
 type ServerConfig struct {
@@ -66,5 +69,8 @@ func (c *Config) ReadLogsConfig() {
 }
 
 func (c *Config) ReadPodSelectorLabel() {
-	c.PodSelectorLabel = os.Getenv("POD_SELECTOR_LABEL")
+	c.PodSelectorLabelKey = os.Getenv("scheduler.pod.selectorLabel.key")
+	c.PodSelectorLabelValue = os.Getenv("scheduler.pod.selectorLabel.value")
+	c.NodeSelectorLabel = os.Getenv("scheduler.node.selectorLabel")
+	c.ZoneSelectorLabel = os.Getenv("scheduler.zone.selectorLabel")
 }

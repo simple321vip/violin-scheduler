@@ -20,7 +20,7 @@ func (h *Handler) Predicate(ctx *gin.Context) {
 	filterResult := &schedulerApi.ExtenderFilterResult{Error: ""}
 	ctx.JSON(http.StatusOK, filterResult)
 
-	if label := args.Pod.Labels[h.C.PodSelectorLabel]; len(label) == 0 {
+	if label := args.Pod.Labels[h.C.PodSelectorLabelKey]; len(label) == 0 {
 		filterResult.Nodes = nil
 		klog.V(5).Infof("predicate request: Pod: %+v, NodeList: %+v", args.Pod, filterResult.Nodes)
 		return

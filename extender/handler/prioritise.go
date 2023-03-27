@@ -26,9 +26,9 @@ func (h *Handler) Prioritise(ctx *gin.Context) {
 	var priorityList schedulerApi.HostPriorityList
 	priorityList = make([]schedulerApi.HostPriority, len(args.Nodes.Items))
 	podList, err := h.Client.CoreV1().Pods("").List(context.TODO(), metaV1.ListOptions{
-		LabelSelector: "",
+		LabelSelector: h.C.PodSelectorLabelKey,
 	})
-	zoneMap := GetZoneMap(args.Nodes.Items)
+	zoneMap := h.GetZoneMap(args.Nodes.Items)
 	maxScore := len(podList.Items)
 
 	common.LG.Info("")
@@ -46,7 +46,7 @@ func (h *Handler) Prioritise(ctx *gin.Context) {
 
 		// by zone
 		podCount = 0
-		zone := zoneMap[node.Labels["xxxxxxx"]]
+		zone := zoneMap[node.Labels[h.C.ZoneSelectorLabel]]
 		for _, pod := range podList.Items {
 			if _, ok := zone.NodeMap[pod.Spec.NodeName]; ok {
 				podCount++
@@ -66,15 +66,15 @@ func (h *Handler) Prioritise(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, priorityList)
 }
 
-func GetZoneMap(items []apiCoreV1.Node) map[string]Zone {
+func (h *Handler) GetZoneMap(items []apiCoreV1.Node) map[string]Zone {
 	zoneMap := make(map[string]Zone)
 	for _, node := range items {
-		zone, ok := zoneMap[node.Labels["xxxxx"]]
+		zone, ok := zoneMap[node.Labels[h.C.ZoneSelectorLabel]]
 		if !ok {
 			zone = Zone{NodeMap: map[string]apiCoreV1.Node{}}
 		}
 		zone.NodeMap[node.Name] = node
-		zoneMap[node.Labels["xxxxxx"]] = zone
+		zoneMap[node.Labels[h.C.ZoneSelectorLabel]] = zone
 	}
 	return zoneMap
 }

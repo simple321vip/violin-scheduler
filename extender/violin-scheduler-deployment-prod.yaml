@@ -1,1 +1,74 @@
-xx
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: violin-scheduler
+  namespace: devops
+  labels:
+    app: violin-scheduler
+    tagUpdateTime: T1675275749
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: violin-scheduler
+  template:
+    metadata:
+      labels:
+        app: violin-scheduler
+    spec:
+      containers:
+        - name: violin-scheduler
+          image: ccr.ccs.tencentyun.com/violin/violin-scheduler:1.0
+          imagePullPolicy: Always
+          args:
+            - "--app.config.location=/app/config/application.yaml"
+          resources:
+            requests:
+              cpu: 50m
+              memory: 200Mi
+            limits:
+              cpu: 100m
+              memory: 300Mi
+          ports:
+            - containerPort: 8081
+          volumeMounts:
+            - name: violin-scheduler-config
+              mountPath: /app/config
+            - name: kube-config
+              mountPath: /root/.kube
+      imagePullSecrets:
+        - name: devops-secret
+      volumes:
+        - name: violin-scheduler-config
+          configMap:
+            name: violin-scheduler-config
+        - name: kube-config
+          hostPath:
+            path: /root/.kube
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: violin-scheduler-config
+  namespace: devops
+data:
+  application: |-
+    server:
+      name: violin-scheduler
+      addr: "0.0.0.0:8080"
+    
+    zap:
+      debugFileName: "/log/violin-scheduler/debug.log"
+      infoFileName: "/log/violin-scheduler/info.log"
+      warnFileName: "/log/violin-scheduler/warn.log"
+    
+    scheduler:
+      pod:
+        namespace: "test"
+        selectorLabel:
+          key: "violin-scheduler-pod"
+          value: "violin-scheduler"
+      node:
+        selectorLabel: "violin-scheduler-node"
+      zone:
+        selectorLabel: "violin-scheduler-zone"
