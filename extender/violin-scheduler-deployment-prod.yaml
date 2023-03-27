@@ -30,7 +30,7 @@ spec:
               cpu: 100m
               memory: 300Mi
           ports:
-            - containerPort: 8081
+            - containerPort: 8080
           volumeMounts:
             - name: violin-scheduler-config
               mountPath: /app/config
