@@ -1,4 +1,4 @@
-package extender
+package main
 
 import (
 	"flag"
@@ -39,10 +39,10 @@ func main() {
 	}
 	r.Group("/scheduler")
 	{
-		r.POST("/", h.Predicate)
-		r.POST("/", h.Preempt)
-		r.POST("/", h.Prioritise)
-		r.POST("/", h.Bind)
+		r.POST("/predicate", h.Predicate)
+		r.POST("/preempt", h.Preempt)
+		r.POST("/prioritise", h.Prioritise)
+		r.POST("/bind", h.Bind)
 	}
 	common.Run(r, c.SC.Name, c.SC.Addr)
 }

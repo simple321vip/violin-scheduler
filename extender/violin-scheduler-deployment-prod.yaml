@@ -52,7 +52,7 @@ metadata:
   name: violin-scheduler-config
   namespace: devops
 data:
-  application: |-
+  application.yaml: |-
     server:
       name: violin-scheduler
       addr: "0.0.0.0:8080"
@@ -72,3 +72,49 @@ data:
         selectorLabel: "violin-scheduler-node"
       zone:
         selectorLabel: "violin-scheduler-zone"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: violin-scheduler-config
+  namespace: devops
+data:
+  scheduler-extender-policy.yaml: |-
+    apiVersion: v1
+    kind: Policy
+    extenders:
+      - urlPrefix: "http://127.0.0.1:8888/scheduler"
+        filterVerb: "predicate"
+        preemptVerb: "preempt"
+        prioritizeVerb: "prioritize"
+        bindVerb: "bind"
+        weight: 1
+        enableHttps: false
+
+  scheduler-extender.yaml: |-
+    apiVersion: kubescheduler.config.k8s.io/v1alpha1
+    kind: KubeSchedulerConfiguration
+    clientConnection:
+      kubeconfig: "/etc/kubernetes/scheduler.conf"
+    algorithmSource:
+      policy:
+        file:
+          path: "/etc/kubernetes/scheduler-extender-policy.yaml"
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: configmap-test
+  namespace: devops
+spec:
+  containers:
+    - name: busybox
+      image: busybox
+      command: ["/bin/sh", "-c", "cat /etc/kubernetes/scheduler-extender.yaml; cat /etc/kubernetes/scheduler-extender-policy.yaml"]
+      volumeMounts:
+        - name: violin-scheduler-config
+          mountPath: /etc/kubernetes/
+  volumes:
+    - name: violin-scheduler-config
+      configMap:
+        name: violin-scheduler-config
